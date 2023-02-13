@@ -6,6 +6,8 @@
   import starSrc from "./assets/star.png";
   import oneUpSrc from "./assets/1up.png";
   import Card from "./lib/Card.svelte";
+  import { fade } from "svelte/transition";
+  import { flip } from "svelte/animate";
 
   function shuffleCards() {
     let cardImages = [
@@ -70,24 +72,30 @@
 
   $: if (failures >= 2) {
     alert("You lost!");
-    cards = shuffleCards();
+    setTimeout(() => {
+      cards = shuffleCards();
+    }, 200);
     failures = 0;
   }
 
   $: if (cards.every((card) => card.solved)) {
     alert(`You won in ${failures} failures 🥳!`);
-    cards = shuffleCards();
+    setTimeout(() => {
+      cards = shuffleCards();
+    }, 200);
     failures = 0;
   }
 </script>
 
 <main>
-  {#each cards as card}
-    <Card
-      src={card.src}
-      flipped={card.solved || choiceOne === card || choiceTwo === card}
-      on:flip={() => handleClick(card)}
-    />
+  {#each cards as card, index (card.id)}
+    <div transition:fade={{ duration: 500, delay: index * 100 }} animate:flip>
+      <Card
+        src={card.src}
+        flipped={card.solved || choiceOne === card || choiceTwo === card}
+        on:flip={() => handleClick(card)}
+      />
+    </div>
   {/each}
 </main>
 
